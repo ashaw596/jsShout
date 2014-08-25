@@ -1,15 +1,9 @@
 <!doctype html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<link href="css/test.css" rel="stylesheet" type="text/css" >
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
-<script src="js/lib/Cookies-master/cookies.min.js"></script>
-
 <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
 <script>
-
+    var chatters = {};
 	function getUrlVars() {
 		var vars = {};
 		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
