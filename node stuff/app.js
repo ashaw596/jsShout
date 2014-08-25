@@ -6,10 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
 //Mongo stuff
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/bughousechess');
-var shoutDB = db.get('shout');
+//var mongo = require('mongodb');
+//var monk = require('monk');
+//var db = monk('localhost:27017/bughousechess');
+//var shoutDB = db.get('shout');
 
 
 //var routes = require('./routes/index');
