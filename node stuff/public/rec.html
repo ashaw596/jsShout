@@ -46,11 +46,61 @@
         msg.lang = 'en-US';
         msg.text = message;
         window.speechSynthesis.speak(msg);  
+        console.log(user+ ":" +message);
     }
     
     socket.on('getChat', function(user, message) {
         readChat(user, message);
     });
+    var mu;
+    socket.on('getMusic', function(music) {
+        mu = music;
+        //mp3 = new Audio(music);
+        //mp3.play();
+        //freader.readAsDataURL(music);
+        console.log("test");
+        console.log(music);
+        play(music.buffer);
+        console.log(music.size);
+        //socket.emit('getMusic',e.target.result);
+        //console.log(mp3);
+    });
+    var freader = new FileReader();
+    
+    freader.onload = function(e) { 
+        //mp3 = new Audio(e.target.result);
+        //mp3.play();
+        
+        console.log("play");
+        
+        //socket.emit('getMusic',e.target.result);
+        //console.log(mp3);
+        
+    }
+    
+    var context = new AudioContext();
+    
+    /**
+     * Appends two ArrayBuffers into a new one.
+     * 
+     * @param {ArrayBuffer} data The ArrayBuffer that was loaded.
+     */
+    function play(buffer) {
+      // Concatenate the two buffers into one.
+      var audioSource = context.createBufferSource();
+      audioSource.connect(context.destination);
+
+      
+      //decode the loaded data
+      context.decodeAudioData(buffer, function(buf) {
+        console.log('The buffer', buf);
+        audioSource.buffer = buf;
+        audioSource.playbackRate = 1;
+        audioSource.start(0);
+      });
+    };
+
+    
     
 </script>
 </head>

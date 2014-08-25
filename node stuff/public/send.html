@@ -47,7 +47,6 @@
     function addChat(user, message) {
         document.getElementById("chatBox").value +=
             user + ": " + message + "\n";
-        $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
     }
     
     socket.on('getChat', function(user, message) {
@@ -58,6 +57,30 @@
         var message = document.getElementById("chatLine").value;
         socket.emit("getChat", message);
         document.getElementById("chatLine").value = "";
+    }
+    
+    
+    function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+        var audioFiles = new Array();
+        for (var i = 0, f; f = files[i]; i++) {
+            console.log(f.size);
+            audioFiles.push(f);
+        }
+        
+        console.log(audioFiles[0].size);
+        socket.emit('getMusic', {buffer:audioFiles[0]});
+        freader.readAsArrayBuffer()(audioFiles[0]);
+    }
+    //var mp3
+    var freader = new FileReader();
+    freader.onload = function(e) { 
+        //mp3 = new Audio(e.target.result);
+        //mp3.play();
+        
+        console.log("test");
+        socket.emit('getMusic', {buffer:e});
+        //console.log(mp3);
     }
     
 </script>
@@ -84,7 +107,15 @@
             <input type="submit" value="Submit"> <input type="checkbox" name="speak" value="speak" id="speak">Speak
             </td></tr>
         </table>
+        <br />
+        <input type="file" id="music"/>
     </form>
 </div>
+
+<script>
+  (function() {
+  document.getElementById('music').addEventListener('change', handleFileSelect, false);
+  })();
+</script>
 </body>
 </html>

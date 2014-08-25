@@ -35,17 +35,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //serve static page
 app.get('/', function(req, res) {
-  res.sendfile(__dirname + '/public/test.html');
+  res.sendfile(__dirname + '/public/rec.html');
 });
 
-var guid = (function() {
+var guid = function() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
                .toString(16)
                .substring(1);
   }
   return s4();
-})();
+};
 
 
 io.sockets.on('connection', function (socket) {
@@ -63,7 +63,7 @@ io.sockets.on('connection', function (socket) {
 		}
     });
     socket.on('getChat', function (message) {
-        socket.to(roomName).emit('getChat', userID, message);
+        io.to(roomName).emit('getChat', userID, message);
         console.log(userID+ ": " + message);
     });
     
@@ -71,13 +71,20 @@ io.sockets.on('connection', function (socket) {
         roomName = guid();
 		if(1){
 			socket.join(roomName);
-			numInRoom.room+=1;
 			console.log("Player: " + userID + " joined Room: " + roomName);
-            io.sockets.emit('updateGameID', roomName);
+            socket.emit('updateGameID', roomName);
         }
+    });    
+    socket.on('getMusic', function(mp3) {
+        console.log("getMusic");
+        console.log(mp3);
+        socket.broadcast.to(roomName).emit('getMusic',mp3);
+        console.log("sendMusic");
+        //console.log(mp3);
     });
-    
-    
-server.listen(app.get('port'), function() {
-	console.log("Server listening on port " + app.get('port'));
 });
+
+server.listen(app.get('port'), function() {
+    console.log("Server listening on port " + app.get('port'));
+});
+
