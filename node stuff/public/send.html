@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<script src="js/lib/Cookies-master/cookies.min.js"></script>
+
+<script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+<script>
+    var guid = (function() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                   .toString(16)
+                   .substring(1);
+        }
+        return s4;
+    })();
+	//parse URL tags
+	function getUrlVars() {
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = value;
+		});
+		return vars;
+	}
+	
+	var socket = io();
+	var gameID = getUrlVars()["gameID"];
+    socket.on('disconnect', function(){
+        console.log("WHY DID YOU DISCONNECT?");
+    });
+	socket.on('connect', function(){
+        userID = guid();
+        socket.emit('setUserID',userID);
+        if(gameID!=null){
+            socket.emit('joinRoom', gameID);
+        } else {
+            socket.emit('newRoom'); //makes game ID and joins game room
+        }
+	});
+    
+	//gets the ID for the new game returned by the server after calling newGame, makes a share link
+	socket.on('updateGameID', function (ID) {
+		if(gameID==null){
+			history.pushState({},document.title,"?gameID=" + ID); //add gameID tag to current url
+		}
+	});
+    
+    function addChat(user, message) {
+        document.getElementById("chatBox").value +=
+            user + ": " + message + "\n";
+        $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+    }
+    
+    socket.on('getChat', function(user, message) {
+        addChat(user, message);
+    });
+    
+    function sendChat() {
+        var message = document.getElementById("chatLine").value;
+        socket.emit("getChat", message);
+        document.getElementById("chatLine").value = "";
+    }
+    
+</script>
+
+
+</head>
+<body>
+
+
+<div id="first"> 
+</div>
+<div id="test"> 
+    <h1> Sender</h1>
+</div>
+
+<div name="chat">
+    <form action="" onsubmit="sendChat();return false;">
+        <table>
+        <tr><td>
+            <textarea name="chatBox" id="chatBox" rows="20" cols="50"></textarea>
+        </td></tr>
+        <tr><td>
+            <input type="text" name="chatLine" id="chatLine">
+            <input type="submit" value="Submit"> <input type="checkbox" name="speak" value="speak" id="speak">Speak
+            </td></tr>
+        </table>
+    </form>
+</div>
+</body>
+</html>
