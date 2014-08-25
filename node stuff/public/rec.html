@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link href="css/test.css" rel="stylesheet" type="text/css" >
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script src="js/lib/Cookies-master/cookies.min.js"></script>
+
+<script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+<script>
+
+	function getUrlVars() {
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = value;
+		});
+		return vars;
+	}
+	
+	var socket = io();
+	var gameID = getUrlVars()["gameID"];
+    socket.on('disconnect', function(){
+        console.log("WHY DID YOU DISCONNECT?");
+    });
+    
+	socket.on('connect', function(){
+            if(gameID!=null){
+                socket.emit('joinRoom', gameID); //join game room
+            }
+            else{
+                socket.emit('newRoom'); //makes game ID and joins game room
+            }
+	});
+	//gets the ID for the new game returned by the server after calling newGame, makes a share link
+	socket.on('updateGameID', function (ID) {
+		history.pushState({},document.title,"?gameID=" + ID); //add gameID tag to current url		
+        gameID = ID;
+	});
+    
+    function readChat(user, message) {
+        var msg = new SpeechSynthesisUtterance();
+        var voices = window.speechSynthesis.getVoices();
+        if(chatters[user]===undefined){
+            chatters[user]=[Math.floor((Math.random() * 11) ),Math.floor((Math.random() * 3) )];
+        }
+        msg.voice = voices[chatters[user][0]]; // Note: some voices don't support altering params
+        msg.voiceURI = 'native';
+        msg.volume = 1; // 0 to 1
+        //msg.rate = 1; // 0.1 to 10
+        msg.pitch = chatters[user][1]; //0 to 2
+        msg.lang = 'en-US';
+        msg.text = message;
+        window.speechSynthesis.speak(msg);  
+    }
+    
+    socket.on('getChat', function(user, message) {
+        readChat(user, message);
+    });
+    
+</script>
+</head>
+<body>
+
+
+<div id="first"> 
+</div>
+<div id="test"> 
+    <h1>Test</h1>
+</div>
+
+</body>
+</html>
